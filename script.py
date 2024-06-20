@@ -32,7 +32,7 @@ def add_series_to_notion(series_data, category):
         'Release Date': {'date': {'start': series_data['release_date']}},
         'Rating': {'number': series_data['rating']},
         'Overview': {'rich_text': [{'text': {'content': series_data['overview']}}]},
-        'Poster': {'files': [{'type': 'external', 'name': 'poster', 'external': {'url': series_data['poster']}}]}
+        'Poster': {'url': series_data['poster']}  # Use URL property for the poster
     }
     try:
         response = notion.pages.create(parent={'database_id': NOTION_DATABASE_ID}, properties=new_page)
@@ -40,11 +40,18 @@ def add_series_to_notion(series_data, category):
     except Exception as e:
         print(f"Error creating page: {e}")
 
+def read_series_list():
+    with open('series_list.txt', 'r') as file:
+        series_list = file.readlines()
+    return [series.strip() for series in series_list]
+
 # Example usage
-series_name = 'Breaking Bad'
-category = 'Watched'
-series_data = fetch_series_metadata(series_name)
-if series_data:
-    add_series_to_notion(series_data, category)
-else:
-    print('Series not found.')
+series_list = read_series_list()
+category = 'Watched'  # Default category, modify as needed
+
+for series_name in series_list:
+    series_data = fetch_series_metadata(series_name)
+    if series_data:
+        add_series_to_notion(series_data, category)
+    else:
+        print(f'Series not found: {series_name}')
