@@ -34,4 +34,17 @@ def add_series_to_notion(series_data, category):
         'Overview': {'rich_text': [{'text': {'content': series_data['overview']}}]},
         'Poster': {'files': [{'type': 'external', 'name': 'poster', 'external': {'url': series_data['poster']}}]}
     }
-    notion.pages.create(parent={'database_id': NOTION_DATABASE_ID}, properties=new_page)
+    try:
+        response = notion.pages.create(parent={'database_id': NOTION_DATABASE_ID}, properties=new_page)
+        print(f"Page created: {response['id']}")
+    except Exception as e:
+        print(f"Error creating page: {e}")
+
+# Example usage
+series_name = 'Breaking Bad'
+category = 'Watched'
+series_data = fetch_series_metadata(series_name)
+if series_data:
+    add_series_to_notion(series_data, category)
+else:
+    print('Series not found.')
