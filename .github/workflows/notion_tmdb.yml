@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'series_list.txt'  # Trigger the workflow when this file is updated
+  workflow_dispatch:  # Allow manual triggering
 
 jobs:
   update-notion:
