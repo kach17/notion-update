@@ -30,22 +30,8 @@ def add_series_to_notion(series_data, category):
         'Name': {'title': [{'text': {'content': series_data['name']}}]},
         'Category': {'select': {'name': category}},
         'Release Date': {'date': {'start': series_data['release_date']}},
-        'Rating': {'number': series_data['rating']}},
+        'Rating': {'number': series_data['rating']},
         'Overview': {'rich_text': [{'text': {'content': series_data['overview']}}]},
         'Poster': {'files': [{'type': 'external', 'name': 'poster', 'external': {'url': series_data['poster']}}]}
     }
     notion.pages.create(parent={'database_id': NOTION_DATABASE_ID}, properties=new_page)
-
-# Read series list from file
-with open('series_list.txt') as f:
-    series_list = f.readlines()
-
-category = 'Watched'  # Default category, can be modified
-for series_name in series_list:
-    series_name = series_name.strip()
-    if series_name:
-        series_data = fetch_series_metadata(series_name)
-        if series_data:
-            add_series_to_notion(series_data, category)
-        else:
-            print(f'Series not found: {series_name}')
