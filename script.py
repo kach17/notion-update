@@ -4,37 +4,48 @@ import json
 import gspread
 from google.oauth2.service_account import Credentials
 from notion_client import Client
+import base64
 
 # Get API keys and database ID from environment variables
 TMDB_API_KEY = os.getenv('TMDB_API_KEY')
 NOTION_API_KEY = os.getenv('NOTION_API_KEY')
 NOTION_DATABASE_ID = os.getenv('NOTION_DATABASE_ID')
-GOOGLE_SHEETS_CREDENTIALS_FILE = os.getenv('GOOGLE_SHEETS_CREDENTIALS_FILE')
 SPREADSHEET_ID = os.getenv('SPREADSHEET_ID')
+
+# Decode and save the Google Sheets credentials JSON
+google_sheets_credentials_base64 = os.getenv('GOOGLE_SHEETS_CREDENTIALS_BASE64')
+google_sheets_credentials_json = base64.b64decode(google_sheets_credentials_base64).decode('utf-8')
+with open('credentials.json', 'w') as f:
+    f.write(google_sheets_credentials_json)
 
 # Initialize Notion client
 notion = Client(auth=NOTION_API_KEY)
 
 # Google Sheets API setup
 scopes = ["https://www.googleapis.com/auth/spreadsheets"]
-creds = Credentials.from_service_account_file(GOOGLE_SHEETS_CREDENTIALS_FILE, scopes=scopes)
+creds = Credentials.from_service_account_file('credentials.json', scopes=scopes)
 client = gspread.authorize(creds)
 
 def fetch_series_metadata(series_name):
-    url = f'https://api.themoviedb.org/3/search/tv?api_key={TMDB_API_KEY}&query={series_name}'
-    response = requests.get(url)
-    data = response.json()
-    if data['results']:
-        series = data['results'][0]
+    search_url = f'https://api.themoviedb.org/3/search/tv?api_key={TMDB_API_KEY}&query={series_name}'
+    search_response = requests.get(search_url)
+    search_data = search_response.json()
+
+    if search_data['results']:
+        series_id = search_data['results'][0]['id']
+        details_url = f'https://api.themoviedb.org/3/tv/{series_id}?api_key={TMDB_API_KEY}'
+        details_response = requests.get(details_url)
+        details_data = details_response.json()
+        
         return {
-            'id': series['id'],
-            'name': series['name'],
-            'release_date': series['first_air_date'],
-            'rating': series['vote_average'],
-            'overview': series['overview'],
-            'poster': f"https://image.tmdb.org/t/p/w500{series['poster_path']}",
-            'backdrop': f"https://image.tmdb.org/t/p/w500{series['backdrop_path']}",
-            'genres': [genre['name'] for genre in series['genre_ids']]
+            'id': details_data['id'],
+            'name': details_data['name'],
+            'release_date': details_data['first_air_date'],
+            'rating': details_data['vote_average'],
+            'overview': details_data['overview'],
+            'poster': f"https://image.tmdb.org/t/p/w500{details_data['poster_path']}",
+            'backdrop': f"https://image.tmdb.org/t/p/w500{details_data['backdrop_path']}",
+            'genres': [genre['name'] for genre in details_data['genres']]
         }
     return None
 
