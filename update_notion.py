@@ -47,19 +47,24 @@ for idx, row in enumerate(rows[last_row:], start=last_row):
         rating = series_info['vote_average']
         poster_path = series_info['poster_path']
         
-        # Add to Notion database
+        # Prepare properties for Notion page creation
+        page_properties = {
+            "Name": {"title": [{"text": {"content": title}}]},
+            "Overview": {"rich_text": [{"text": {"content": overview}}]},
+            "Release Date": {"date": {"start": release_date}},
+            "Rating": {"number": rating}
+        }
+        
+        if poster_path:
+            poster_url = f"https://image.tmdb.org/t/p/w500{poster_path}"
+            page_properties["Poster"] = {"url": poster_url}
+        
+        # Create page in Notion database
         notion.pages.create(
             parent={"database_id": "9c8a112777c4485f86b7dfeb4362bd8b"},
-            properties={
-                "Name": {"title": [{"text": {"content": title}}]},
-                "Overview": {"rich_text": [{"text": {"content": overview}}]},
-                "Release Date": {"date": {"start": release_date}},
-                "Rating": {"number": rating},
-                "Poster": {"url": f"https://image.tmdb.org/t/p/w500{poster_path}"}
-            }
+            properties=page_properties
         )
     
     # Update the last processed row
     with open(last_row_file, "w") as f:
         f.write(str(idx + 1))
-
