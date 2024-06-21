@@ -1,9 +1,8 @@
 name: Update Notion with TMDb Data
 
 on:
-  push:
-    paths:
-      - 'series_list.txt'  # Update this path if needed
+  schedule:
+    - cron: '0 * * * *'  # Run every hour
   workflow_dispatch:  # Allow manual triggering
 
 jobs:
