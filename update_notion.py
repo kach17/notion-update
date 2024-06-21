@@ -49,7 +49,7 @@ for idx, row in enumerate(rows[last_row:], start=last_row):
         
         # Add to Notion database
         notion.pages.create(
-            parent={"database_id": "<YOUR_NOTION_DATABASE_ID>"},
+            parent={"database_id": "9c8a112777c4485f86b7dfeb4362bd8b"},
             properties={
                 "Name": {"title": [{"text": {"content": title}}]},
                 "Overview": {"rich_text": [{"text": {"content": overview}}]},
