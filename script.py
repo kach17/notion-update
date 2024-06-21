@@ -9,7 +9,7 @@ from notion_client import Client
 TMDB_API_KEY = os.getenv('TMDB_API_KEY')
 NOTION_API_KEY = os.getenv('NOTION_API_KEY')
 NOTION_DATABASE_ID = os.getenv('NOTION_DATABASE_ID')
-GOOGLE_SHEETS_CREDENTIALS_FILE = os.getenv('SheetsCred.json')
+GOOGLE_SHEETS_CREDENTIALS_FILE = os.getenv('GOOGLE_SHEETS_CREDENTIALS_FILE')
 SPREADSHEET_ID = os.getenv('SPREADSHEET_ID')
 
 # Initialize Notion client
